@@ -5,15 +5,26 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.drawable.GradientDrawable;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 public class Splash extends Activity {
 
@@ -21,6 +32,7 @@ public class Splash extends Activity {
     private Context splashClassContext;
     private WifiManager wifiManager;
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,58 +47,25 @@ public class Splash extends Activity {
         final ImageView bgImage = (ImageView) findViewById(R.id.imageView);
         bgImage.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
 
-        final ImageView txtImage = (ImageView) findViewById(R.id.imageView3);
-        Animation animation = AnimationUtils.loadAnimation(getBaseContext(), R.anim.scale);
-        txtImage.startAnimation(animation);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
 
+        final ImageView wifiImage = (ImageView) findViewById(R.id.imageView3);
+        wifiImage.getLayoutParams().width = size.x / 2;
+
+        final ImageView metrologoImage = (ImageView) findViewById(R.id.metrologo);
+        metrologoImage.getLayoutParams().width = size.x * 2 / 5;
+
+        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager.isWifiEnabled()) {
+            if (isReachable()) {
+                Intent intent = new Intent(splashClassContext, LoginActivity.class);
+                startActivity(intent);
+                finishAffinity();
             }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                animation = AnimationUtils.loadAnimation(getBaseContext(), R.anim.scale2);
-                txtImage.startAnimation(animation);
-
-                animation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        spinner.setVisibility(View.VISIBLE);
-
-                        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-                        if (wifiManager.isWifiEnabled()) {
-                            if (isReachable()) {
-                                Intent intent = new Intent(splashClassContext, LoginActivity.class);
-                                startActivity(intent);
-                                finishAffinity();
-                            } else
-                                showAlert();
-                        } else
-                            showAlert();
-
-                        spinner.setVisibility(View.GONE);
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
+        }
+        showAlert();
     }
 
     private boolean isReachable() {
@@ -100,17 +79,38 @@ public class Splash extends Activity {
     }
 
     private void showAlert() {
-        AlertDialog alertDialog = new AlertDialog.Builder(Splash.this).create();
-        alertDialog.setTitle("Oops");
-        alertDialog.setMessage("Metro free wifi is not reachable. Please go to Flinders Street Station and try again.");
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        finishAffinity();
-                    }
-                });
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.splash_alertdialog, null);
+        dialogBuilder.setView(dialogView);
+        final AlertDialog alertDialog = dialogBuilder.create();
+        final Button btn = (Button) dialogView.findViewById(R.id.ok);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                finishAffinity();
+            }
+        });
+        btn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                GradientDrawable backgroundShape = (GradientDrawable)btn.getBackground();
+                switch ( event.getAction() ) {
+                    case MotionEvent.ACTION_DOWN:
+                        backgroundShape.setColor(Color.WHITE);
+                        btn.setTextColor(ContextCompat.getColor(splashClassContext, R.color.splash_dialog_background));
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        backgroundShape.setColor(ContextCompat.getColor(splashClassContext, R.color.splash_dialog_background));
+                        btn.setTextColor(Color.WHITE);
+                        break;
+                }
+
+                return false;
+            }
+        });
         alertDialog.show();
     }
 }
