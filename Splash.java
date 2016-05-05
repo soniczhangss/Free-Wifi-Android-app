@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -25,6 +26,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
 
 public class Splash extends Activity {
 
@@ -57,15 +64,24 @@ public class Splash extends Activity {
         final ImageView metrologoImage = (ImageView) findViewById(R.id.metrologo);
         metrologoImage.getLayoutParams().width = size.x * 2 / 5;
 
+        TextView appactionText = (TextView) findViewById(R.id.app_action);
         wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        appactionText.setText("Checking Wifi Status...");
         if (wifiManager.isWifiEnabled()) {
             if (isReachable()) {
-                Intent intent = new Intent(splashClassContext, LoginActivity.class);
-                startActivity(intent);
-                finishAffinity();
+                if (!isInternetAvailable()) {
+                    Intent intent = new Intent(splashClassContext, LoginActivity.class);
+                    startActivity(intent);
+                    finishAffinity();
+                } else {
+                    showAlert("You still have the Internet access. You do not need to login again.");
+                }
+            } else {
+                showAlert("Metro Free Wifi is not available.");
             }
+        } else {
+            showAlert("Wifi is turned off.");
         }
-        showAlert();
     }
 
     private boolean isReachable() {
@@ -78,11 +94,25 @@ public class Splash extends Activity {
         return isReachable;
     }
 
-    private void showAlert() {
+    public boolean isInternetAvailable() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int     exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+        } catch (Exception e) {
+            Log.e("Splash Screen", "Error checking internet connection", e);
+        }
+        return false;
+    }
+
+    private void showAlert(String info) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.splash_alertdialog, null);
         dialogBuilder.setView(dialogView);
+        final TextView alertText = (TextView) dialogView.findViewById(R.id.alert_content);
+        alertText.setText(info);
         final AlertDialog alertDialog = dialogBuilder.create();
         final Button btn = (Button) dialogView.findViewById(R.id.ok);
         btn.setOnClickListener(new View.OnClickListener() {
