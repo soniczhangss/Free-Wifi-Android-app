@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.GradientDrawable;
@@ -38,11 +39,14 @@ public class Splash extends Activity {
     private ProgressBar spinner;
     private Context splashClassContext;
     private WifiManager wifiManager;
+    private SharedPreferences prefs = null;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        prefs = getSharedPreferences("au.com.netbay.metrofreewifi", MODE_PRIVATE);
 
         splashClassContext = this.getApplicationContext();
 
@@ -80,7 +84,21 @@ public class Splash extends Activity {
                 showAlert("Metro Free Wifi is not available.");
             }
         } else {
-            showAlert("Wifi is turned off.");
+            showAlert("Your Wifi is turned off.");
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // First time startup.
+        if (prefs.getBoolean("au.com.netbay.metrofreewifi.GeofenceIntentService", true)) {
+            Log.i("Login", "Intent fired");
+            Intent intent = new Intent(this, GoogleClientAPIService.class);
+            startService(intent);
+
+            prefs.edit().putBoolean("au.com.netbay.metrofreewifi.GeofenceIntentService", false).commit();
         }
     }
 

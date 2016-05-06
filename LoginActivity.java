@@ -42,11 +42,10 @@ import java.util.Map;
 
 public class LoginActivity extends Activity {
 
-    SharedPreferences prefs = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         final ImageView bgImage = (ImageView) findViewById(R.id.imageView);
@@ -64,39 +63,6 @@ public class LoginActivity extends Activity {
 
         final ImageView metrologoImage = (ImageView) findViewById(R.id.metrologo);
         metrologoImage.getLayoutParams().width = size.x * 2 / 5;
-
-        /*String checkBoxText = Constants.TERMS_CONDITIONS;
-        CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
-        checkBox.append(Html.fromHtml(checkBoxText));
-        checkBox.setMovementMethod(LinkMovementMethod.getInstance());
-
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ImageButton button = (ImageButton) findViewById(R.id.login_btn);
-                if (isChecked) {
-                    button.setEnabled(true);
-                } else {
-                    button.setEnabled(false);
-                }
-            }
-        });*/
-
-        prefs = getSharedPreferences("au.com.netbay.metrofreewifi", MODE_PRIVATE);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        // First time startup.
-        if (prefs.getBoolean("au.com.netbay.metrofreewifi.GeofenceIntentService", true)) {
-            Log.i("Login", "Intent fired");
-            Intent intent = new Intent(this, GoogleClientAPIService.class);
-            startService(intent);
-
-            prefs.edit().putBoolean("au.com.netbay.metrofreewifi.GeofenceIntentService", false).commit();
-        }
     }
 
     public void loginBtnHandler(View view) {

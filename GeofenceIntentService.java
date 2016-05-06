@@ -3,9 +3,8 @@ package au.com.netbay.metrofreewifi;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Intent;
 import android.content.Context;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -13,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
@@ -120,23 +120,27 @@ public class GeofenceIntentService extends IntentService {
     }
 
     private void sendNotification(String notificationDetails) {
-        Intent notificationIntent = new Intent(getApplicationContext(), LoginActivity.class);
+        Intent notificationIntent = new Intent(getApplicationContext(), Splash.class);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 
-        stackBuilder.addParentStack(LoginActivity.class);
+        stackBuilder.addParentStack(Splash.class);
 
         stackBuilder.addNextIntent(notificationIntent);
 
         PendingIntent notificationPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        RemoteViews remoteViews = new RemoteViews(getPackageName(),
+                R.layout.notification);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
         builder.setSmallIcon(R.drawable.ic_wifi_white_48dp)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(getString(R.string.geofence_transition_notification_text))
-            .setContentIntent(notificationPendingIntent);
+            /*.setContentTitle(getString(R.string.app_name))
+            .setContentText(getString(R.string.geofence_transition_notification_text))*/
+            .setContentIntent(notificationPendingIntent)
+            .setContent(remoteViews);
 
         builder.setAutoCancel(true);
 
