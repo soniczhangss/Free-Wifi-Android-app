@@ -3,7 +3,6 @@ package au.com.netbay.metrofreewifi;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -19,20 +18,10 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.URL;
 
 public class Splash extends Activity {
 
@@ -92,7 +81,6 @@ public class Splash extends Activity {
     protected void onStart() {
         super.onStart();
 
-        // First time startup.
         if (prefs.getBoolean("au.com.netbay.metrofreewifi.GeofenceIntentService", true)) {
             Log.i("Login", "Intent fired");
             Intent intent = new Intent(this, GoogleClientAPIService.class);

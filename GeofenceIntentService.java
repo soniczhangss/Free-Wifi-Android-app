@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.support.v4.app.NotificationCompat;
@@ -79,7 +78,6 @@ public class GeofenceIntentService extends IntentService {
 
     private boolean reconnect() {
         String networkSSID = Constants.SSID;
-        //String networkPass = "";
 
         WifiConfiguration conf = new WifiConfiguration();
         conf.SSID = "\"" + networkSSID + "\"";
@@ -137,8 +135,6 @@ public class GeofenceIntentService extends IntentService {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
         builder.setSmallIcon(R.drawable.ic_wifi_white_48dp)
-            /*.setContentTitle(getString(R.string.app_name))
-            .setContentText(getString(R.string.geofence_transition_notification_text))*/
             .setContentIntent(notificationPendingIntent)
             .setContent(remoteViews);
 

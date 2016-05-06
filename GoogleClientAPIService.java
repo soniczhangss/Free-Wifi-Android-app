@@ -3,7 +3,6 @@ package au.com.netbay.metrofreewifi;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -36,8 +35,6 @@ public class GoogleClientAPIService extends IntentService implements GoogleApiCl
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            final String action = intent.getAction();
-
             mGeofenceList = new ArrayList<Geofence>();
 
             mGeofencePendingIntent = null;
